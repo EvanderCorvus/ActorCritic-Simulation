@@ -36,8 +36,8 @@ def update_state(state, action, dt, U0, batch_size, char_length, device = 'cuda'
     x, y, F_x, F_y, theta = state[:,0], state[:,1], state[:,2], state[:,3], state[:,4]
     
     F_x, F_y = force(x,y,U0)
-
-    theta = action[:,0] #+ vorticity[:,0]*dt
+    # raise Exception(action.shape)
+    theta = action #+ vorticity[:,0]*dt
     noise = tr.normal(tr.zeros(batch_size),tr.ones(batch_size)).to(device)
     theta = theta + np.sqrt(dt)*char_length*noise
     # theta = theta % (2*np.pi)
@@ -76,4 +76,5 @@ def reward(state, dt, target_bool, wall_bool, device = 'cuda'):
 
     reward_t[target_bool] = 100 #batch_size #Large reward that scales with batch_size
     reward_t[wall_bool] = -10
+    # reward_t = tr.where(target_bool,-10,reward_t)
     return reward_t

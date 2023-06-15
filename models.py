@@ -8,23 +8,24 @@ from collections import deque
 class Actor(nn.Module):
     def __init__(self,hidden_dim):#state-space: orientation, position, force
         super(Actor, self).__init__()
-        self.network = nn.Sequential(
+        self.actor_network = nn.Sequential(
             nn.Linear(5,hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim,hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim,1),
-            nn.BatchNorm1d(1),
-            nn.Sigmoid()
+            nn.Linear(hidden_dim,2)
         )
     #Action space: Absolute orientation
     def forward(self,state):
-        return(2*np.pi*self.network(state))
+        musigma = self.actor_network(state)
+        
+        mu, sigma = musigma[:,0], musigma[:,1]
+        return mu, sigma
 
 class Critic(nn.Module):
     def __init__(self,hidden_dim):
         super(Critic,self).__init__()
-        self.network = nn.Sequential(
+        self.critic_network = nn.Sequential(
             #state+action dim
             nn.Linear(6,hidden_dim),
             nn.ReLU(),
@@ -33,7 +34,9 @@ class Critic(nn.Module):
             nn.Linear(hidden_dim,1)
         )
     def forward(self,state,action):
-        return self.network(tr.cat([state, action], dim=1))
+
+        state_action = tr.cat([state, action[:,None]], dim=1)
+        return self.critic_network(state_action)
     
 # class Memory:
 #     def __init__(self, max_size):
