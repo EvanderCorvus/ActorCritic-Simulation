@@ -39,10 +39,14 @@ def plot_epoch( x_paths, y_paths, max_steps, epochs, dt,U0):
     plt.legend(bbox_to_anchor=(1,-0.1),ncol=2)
     plt.show()
 
-def plot_simulation_data( total_mean_losses,max_episodes, char_length):
+def plot_simulation_data(total_mean_losses, mse_mean_losses, kl_mean_losses,max_episodes, char_length):
     fig, ax = plt.subplots()
-    X = np.linspace(0,max_episodes,max_episodes)
-    ax.plot(X, total_mean_losses, label = 'Loss', c='black')
+    X = np.linspace(3,max_episodes,max_episodes-2)
+    ax.plot(X, total_mean_losses[2:], label = 'Total Loss', c='black')
+    ax.plot(X, mse_mean_losses[2:], label = 'MSE Loss')
+    ax.plot(X, kl_mean_losses[2:], label = 'KL Loss')
+
+    ax.legend()
     ax.set_xlabel('Episode')
     ax.set_ylabel('Loss')
     ax.set_title(r'$\sqrt{D_RL/v_0}$ = '+ str(char_length))
